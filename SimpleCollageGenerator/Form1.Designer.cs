@@ -1,6 +1,6 @@
 ﻿namespace SimpleCollageGenerator
 {
-    partial class Form1
+    partial class frmMain
     {
         /// <summary>
         /// Required designer variable.
@@ -115,7 +115,7 @@
             this.btnBrowseDest.UseVisualStyleBackColor = true;
             this.btnBrowseDest.Click += new System.EventHandler(this.btnBrowseDest_Click);
             // 
-            // Form1
+            // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -129,7 +129,8 @@
             this.Controls.Add(this.txtDestination);
             this.Controls.Add(this.txtSource);
             this.MinimumSize = new System.Drawing.Size(850, 600);
-            this.Name = "Form1";
+            this.Name = "frmMain";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Simple Collage Maker";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.trkQuality)).EndInit();

@@ -12,12 +12,12 @@ using System.Windows.Forms;
 
 namespace SimpleCollageGenerator
 {
-    public partial class Form1 : Form
+    public partial class frmMain : Form
     {
         BackgroundWorker _bw = new BackgroundWorker();
         int _qualityDivisor;
 
-        public Form1()
+        public frmMain()
         {
             InitializeComponent();
         }
