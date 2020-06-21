@@ -101,7 +101,9 @@ namespace SimpleCollageGenerator
             try
             {
                 var fileList = new List<string>();
-                var files = Directory.GetFiles(txtSource.Text, "*.*", SearchOption.TopDirectoryOnly);
+                var files = Directory.GetFiles(txtSource.Text, "*.*", SearchOption.TopDirectoryOnly).ToList();
+                files = files.CustomSort().ToList();
+
 
                 foreach (string filename in files)
                 {
@@ -115,18 +117,22 @@ namespace SimpleCollageGenerator
                         fileList.Add(filename);
                 }
 
+                fileList = fileList.CustomSort().ToList();
+
                 if (fileList.Count() < 1)
                 {
                     throw new Exception("No Items Found");
                 }
 
-                foreach (var item in fileList.CustomSort())
-                {
-                    fileList.Add(item);
-                }
+                //foreach (var item in fileList.CustomSort())
+                //{
+                //    fileList.Add(item);
+                //}
 
                 var pages = new List<PageInfo>();
                 var page = new PageInfo();
+
+                
 
                 for (int i = 0; i <= fileList.Count - 1; i++)
                 {
@@ -139,7 +145,7 @@ namespace SimpleCollageGenerator
 
                     try
                     {
-                        _bw.ReportProgress(0, string.Format("Validating File: {0}", fileList[i]));
+                        //_bw.ReportProgress(0, string.Format("Validating File: {0}", fileList[i]));
                         Image testImage;
                         testImage = Image.FromFile(fileList[i]);
                         try
@@ -149,7 +155,7 @@ namespace SimpleCollageGenerator
                         }
                         catch
                         {
-
+                            _bw.ReportProgress(0, "Failed to load preview");
                         }
 
                         testImage.Dispose();
@@ -186,12 +192,15 @@ namespace SimpleCollageGenerator
                     {
                         page.Pic3 = fileList[i];
                         _bw.ReportProgress(0, string.Format("Adding: {0}", fileList[i]));
+                        pages.Add(page);
+                        page = new PageInfo();
                         if (!isLast) continue;
                     }
 
                     if (isLast)
                     {
                         pages.Add(page);
+                        page = new PageInfo();
                     }
                     else
                     {
