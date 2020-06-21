@@ -24,11 +24,23 @@ namespace SimpleCollageGenerator
 
         private void btnStart_Click(object sender, EventArgs e)
         {
-            _qualityDivisor = 10 - trkQuality.Value + 1;
-            lstLogs.Items.Clear();
-            triggerButtons(false);
             
-            _bw.RunWorkerAsync();
+            if ((btnStart.Text == "Start")|| (btnStart.Text == "&Start"))
+            {
+                _qualityDivisor = 10 - trkQuality.Value + 1;
+                lstLogs.Items.Clear();
+                triggerButtons(false);
+                _bw.RunWorkerAsync();
+            } else if ((btnStart.Text == "&Cancel") || (btnStart.Text == "Cancel"))
+            {
+                if (_bw.IsBusy)
+                {
+                    _bw.CancelAsync();
+                }
+            } else
+            {
+                MessageBox.Show(btnStart.Text);
+            }
         }
 
         private void triggerButtons(bool enable = false)
@@ -39,16 +51,21 @@ namespace SimpleCollageGenerator
                 txtSource.Enabled = true;
                 btnBrowseDest.Enabled = true;
                 btnBrowseSrc.Enabled = true;
-                btnStart.Enabled = true;
+                //btnStart.Enabled = true;
                 trkQuality.Enabled = true;
+
+                btnStart.Text = "&Start";
+
+
             } else
             {
                 txtDestination.Enabled = false;
                 txtSource.Enabled = false;
                 btnBrowseDest.Enabled = false;
                 btnBrowseSrc.Enabled = false;
-                btnStart.Enabled = false;
+                //btnStart.Enabled = false;
                 trkQuality.Enabled = false;
+                btnStart.Text = "&Cancel";
             }
         }
 
@@ -89,15 +106,25 @@ namespace SimpleCollageGenerator
             try
             {
                 var fileList = new List<string>();
-                var files = Directory.GetFiles(txtSource.Text, "*.*", SearchOption.AllDirectories);
+                var files = Directory.GetFiles(txtSource.Text, "*.*", SearchOption.TopDirectoryOnly);
 
                 foreach (string filename in files)
                 {
+                    if (_bw.CancellationPending)
+                    {
+                        e.Cancel = true;
+                        return;
+                    }
+
                     if (Regex.IsMatch(filename, @".jpg|.png|.gif|.tiff$", RegexOptions.IgnoreCase))
                         fileList.Add(filename);
                 }
 
-                //foreach (var item in Directory.GetFiles(txtSource.Text).CustomSort())
+                if (fileList.Count() < 1)
+                {
+                    throw new Exception("No Items Found");
+                }
+
                 foreach (var item in fileList.CustomSort())
                 {
                     fileList.Add(item);
@@ -106,8 +133,39 @@ namespace SimpleCollageGenerator
                 var pages = new List<PageInfo>();
                 var page = new PageInfo();
 
+                
+
                 for (int i = 0; i <= fileList.Count - 1; i++)
                 {
+
+                    if (_bw.CancellationPending)
+                    {
+                        e.Cancel = true;
+                        return;
+                    }
+
+                    try
+                    {
+                        _bw.ReportProgress(0, string.Format("Validating File: {0}", fileList[i]));
+                        Image testImage;
+                        testImage = Image.FromFile(fileList[i]);
+                        try
+                        {
+                            pctPreview.SizeMode = PictureBoxSizeMode.StretchImage;
+                            pctPreview.ImageLocation = fileList[i];
+                        }
+                        catch
+                        {
+
+                        }
+
+                        testImage.Dispose();
+                    } catch
+                    {
+                        _bw.ReportProgress(0, string.Format("Skipping File: {0}", fileList[i]));
+                        continue;
+                    }
+
                     var isLast = i == fileList.Count - 1 ? true : false;
 
                     if (string.IsNullOrEmpty(page.Pic0))
@@ -116,7 +174,6 @@ namespace SimpleCollageGenerator
                         _bw.ReportProgress(0, string.Format("Adding: {0}", fileList[i]));
                         if (!isLast) continue;
                     }
-
 
                     if (string.IsNullOrEmpty(page.Pic1))
                     {
@@ -169,6 +226,11 @@ namespace SimpleCollageGenerator
 
                 for (int i = 0; i <= pages.Count() - 1; i++)
                 {
+                    if (_bw.CancellationPending)
+                    {
+                        e.Cancel = true;
+                        return;
+                    }
 
                     _bw.ReportProgress(0, string.Format("Processing page: {0}", i + 1));
 
@@ -248,6 +310,7 @@ namespace SimpleCollageGenerator
             _bw.ProgressChanged += _bw_ProgressChanged;
             _bw.RunWorkerCompleted += _bw_RunWorkerCompleted;
             _bw.WorkerReportsProgress = true;
+            _bw.WorkerSupportsCancellation = true;
         }
 
         private void btnBrowseSrc_Click(object sender, EventArgs e)
