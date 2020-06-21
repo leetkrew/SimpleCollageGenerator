@@ -51,19 +51,14 @@ namespace SimpleCollageGenerator
                 txtSource.Enabled = true;
                 btnBrowseDest.Enabled = true;
                 btnBrowseSrc.Enabled = true;
-                //btnStart.Enabled = true;
                 trkQuality.Enabled = true;
-
                 btnStart.Text = "&Start";
-
-
             } else
             {
                 txtDestination.Enabled = false;
                 txtSource.Enabled = false;
                 btnBrowseDest.Enabled = false;
                 btnBrowseSrc.Enabled = false;
-                //btnStart.Enabled = false;
                 trkQuality.Enabled = false;
                 btnStart.Text = "&Cancel";
             }
@@ -132,8 +127,6 @@ namespace SimpleCollageGenerator
 
                 var pages = new List<PageInfo>();
                 var page = new PageInfo();
-
-                
 
                 for (int i = 0; i <= fileList.Count - 1; i++)
                 {
