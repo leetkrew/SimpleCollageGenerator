@@ -124,15 +124,8 @@ namespace SimpleCollageGenerator
                     throw new Exception("No Items Found");
                 }
 
-                //foreach (var item in fileList.CustomSort())
-                //{
-                //    fileList.Add(item);
-                //}
-
                 var pages = new List<PageInfo>();
                 var page = new PageInfo();
-
-                
 
                 for (int i = 0; i <= fileList.Count - 1; i++)
                 {
@@ -170,28 +163,40 @@ namespace SimpleCollageGenerator
                     if (string.IsNullOrEmpty(page.Pic0))
                     {
                         page.Pic0 = fileList[i];
-                        _bw.ReportProgress(0, string.Format("Adding: {0}", fileList[i]));
+                        _bw.ReportProgress(0, string.Format("Adding {0}, page {1}, upper left", 
+                            fileList[i], 
+                            pages.Count() + 1
+                            ));
                         if (!isLast) continue;
                     }
 
                     if (string.IsNullOrEmpty(page.Pic1))
                     {
                         page.Pic1 = fileList[i];
-                        _bw.ReportProgress(0, string.Format("Adding: {0}", fileList[i]));
+                        _bw.ReportProgress(0, string.Format("Adding {0}, page {1}, upper right",
+                            fileList[i],
+                            pages.Count() + 1
+                            ));
                         if (!isLast) continue;
                     }
 
                     if (string.IsNullOrEmpty(page.Pic2))
                     {
                         page.Pic2 = fileList[i];
-                        _bw.ReportProgress(0, string.Format("Adding: {0}", fileList[i]));
+                        _bw.ReportProgress(0, string.Format("Adding {0}, page {1}, lower left",
+                            fileList[i],
+                            pages.Count() + 1
+                            ));
                         if (!isLast) continue;
                     }
 
                     if (string.IsNullOrEmpty(page.Pic3))
                     {
                         page.Pic3 = fileList[i];
-                        _bw.ReportProgress(0, string.Format("Adding: {0}", fileList[i]));
+                        _bw.ReportProgress(0, string.Format("Adding {0}, page {1}, upper right",
+                            fileList[i],
+                            pages.Count() + 1
+                            ));
                         pages.Add(page);
                         page = new PageInfo();
                         if (!isLast) continue;
@@ -199,6 +204,16 @@ namespace SimpleCollageGenerator
 
                     if (isLast)
                     {
+                        if (
+                            (string.IsNullOrEmpty(page.Pic0)) &&
+                            (string.IsNullOrEmpty(page.Pic1)) &&
+                            (string.IsNullOrEmpty(page.Pic2)) &&
+                            (string.IsNullOrEmpty(page.Pic3))
+                            )
+                        {
+                            break;
+                        }
+
                         pages.Add(page);
                         page = new PageInfo();
                     }
