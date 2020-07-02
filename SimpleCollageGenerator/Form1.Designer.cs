@@ -69,7 +69,7 @@
             this.btnStart.Location = new System.Drawing.Point(579, 126);
             this.btnStart.Name = "btnStart";
             this.btnStart.Size = new System.Drawing.Size(75, 26);
-            this.btnStart.TabIndex = 8;
+            this.btnStart.TabIndex = 9;
             this.btnStart.Text = "Start";
             this.btnStart.UseVisualStyleBackColor = true;
             this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
@@ -83,7 +83,7 @@
             this.lstLogs.Location = new System.Drawing.Point(12, 190);
             this.lstLogs.Name = "lstLogs";
             this.lstLogs.Size = new System.Drawing.Size(810, 407);
-            this.lstLogs.TabIndex = 9;
+            this.lstLogs.TabIndex = 10;
             // 
             // trkQuality
             // 
@@ -189,7 +189,7 @@
             this.cboLayout.Location = new System.Drawing.Point(498, 126);
             this.cboLayout.Name = "cboLayout";
             this.cboLayout.Size = new System.Drawing.Size(75, 21);
-            this.cboLayout.TabIndex = 12;
+            this.cboLayout.TabIndex = 8;
             // 
             // label3
             // 
