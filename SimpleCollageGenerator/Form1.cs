@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -15,7 +16,8 @@ namespace SimpleCollageGenerator
     public partial class frmMain : Form
     {
         BackgroundWorker _bw = new BackgroundWorker();
-        int _qualityDivisor;
+        double _qualitySettings = 1;
+        string _destinationFolder = string.Empty;
 
         public frmMain()
         {
@@ -27,7 +29,7 @@ namespace SimpleCollageGenerator
             
             if ((btnStart.Text == "Start")|| (btnStart.Text == "&Start"))
             {
-                _qualityDivisor = 10 - trkQuality.Value + 1;
+                _qualitySettings = Double.Parse(trkQuality.Value.ToString()) / 100;
                 lstLogs.Items.Clear();
                 triggerButtons(false);
                 _bw.RunWorkerAsync();
@@ -70,6 +72,7 @@ namespace SimpleCollageGenerator
             lstLogs.Items.Add("Done");
             lstLogs.SelectedIndex = lstLogs.Items.Count - 1;
             triggerButtons(true);
+            Process.Start("explorer.exe", _destinationFolder);
         }
 
         private void _bw_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -93,7 +96,6 @@ namespace SimpleCollageGenerator
             }
 
             lstLogs.SelectedIndex = lstLogs.Items.Count - 1;
-
         }
 
         private void _bw_DoWork(object sender, DoWorkEventArgs e)
@@ -124,196 +126,9 @@ namespace SimpleCollageGenerator
                     throw new Exception("No Items Found");
                 }
 
-                var pages = new List<PageInfo>();
-                var page = new PageInfo();
+                var cellSpacing = 3;
 
-                for (int i = 0; i <= fileList.Count - 1; i++)
-                {
-
-                    if (_bw.CancellationPending)
-                    {
-                        e.Cancel = true;
-                        return;
-                    }
-
-                    try
-                    {
-                        //_bw.ReportProgress(0, string.Format("Validating File: {0}", fileList[i]));
-                        Image testImage;
-                        testImage = Image.FromFile(fileList[i]);
-                        try
-                        {
-                            pctPreview.SizeMode = PictureBoxSizeMode.StretchImage;
-                            pctPreview.ImageLocation = fileList[i];
-                        }
-                        catch
-                        {
-                            _bw.ReportProgress(0, "Failed to load preview");
-                        }
-
-                        testImage.Dispose();
-                    } catch
-                    {
-                        _bw.ReportProgress(0, string.Format("Skipping File: {0}", fileList[i]));
-                        continue;
-                    }
-
-                    var isLast = i == fileList.Count - 1 ? true : false;
-
-                    if (string.IsNullOrEmpty(page.Pic0))
-                    {
-                        page.Pic0 = fileList[i];
-                        _bw.ReportProgress(0, string.Format("Adding {0}, page {1}, upper left", 
-                            fileList[i], 
-                            pages.Count() + 1
-                            ));
-                        if (!isLast) continue;
-                    }
-
-                    if (string.IsNullOrEmpty(page.Pic1))
-                    {
-                        page.Pic1 = fileList[i];
-                        _bw.ReportProgress(0, string.Format("Adding {0}, page {1}, upper right",
-                            fileList[i],
-                            pages.Count() + 1
-                            ));
-                        if (!isLast) continue;
-                    }
-
-                    if (string.IsNullOrEmpty(page.Pic2))
-                    {
-                        page.Pic2 = fileList[i];
-                        _bw.ReportProgress(0, string.Format("Adding {0}, page {1}, lower left",
-                            fileList[i],
-                            pages.Count() + 1
-                            ));
-                        if (!isLast) continue;
-                    }
-
-                    if (string.IsNullOrEmpty(page.Pic3))
-                    {
-                        page.Pic3 = fileList[i];
-                        _bw.ReportProgress(0, string.Format("Adding {0}, page {1}, upper right",
-                            fileList[i],
-                            pages.Count() + 1
-                            ));
-                        pages.Add(page);
-                        page = new PageInfo();
-                        if (!isLast) continue;
-                    }
-
-                    if (isLast)
-                    {
-                        if (
-                            (string.IsNullOrEmpty(page.Pic0)) &&
-                            (string.IsNullOrEmpty(page.Pic1)) &&
-                            (string.IsNullOrEmpty(page.Pic2)) &&
-                            (string.IsNullOrEmpty(page.Pic3))
-                            )
-                        {
-                            break;
-                        }
-
-                        pages.Add(page);
-                        page = new PageInfo();
-                    }
-                    else
-                    {
-                        _bw.ReportProgress(0, string.Format("Queueing page #{0}", pages.Count() + 1 ));
-                        page = new PageInfo();
-                        page.Pic0 = fileList[i];
-                        _bw.ReportProgress(0, string.Format("Adding: {0}", fileList[i]));
-                        pages.Add(page);
-                    }
-                }
-
-                var destinationFolder = string.Format("{0}\\output_{1}{2}{3}{4}"
-                            , txtDestination.Text
-                            , DateTime.Now.ToString("yyyyMMdd")
-                            , DateTime.Now.Hour
-                            , DateTime.Now.Minute
-                            , DateTime.Now.Second
-                            );
-
-                if (!Directory.Exists(destinationFolder))
-                {
-                    Directory.CreateDirectory(destinationFolder);
-                    _bw.ReportProgress(0, string.Format("{0} has been created", destinationFolder));
-                }
-
-                for (int i = 0; i <= pages.Count() - 1; i++)
-                {
-                    if (_bw.CancellationPending)
-                    {
-                        e.Cancel = true;
-                        return;
-                    }
-
-                    _bw.ReportProgress(0, string.Format("Processing page: {0}", i + 1));
-
-                    var img0 = Image.FromFile(pages[i].Pic0);
-                    var img1 = Image.FromFile(pages[i].Pic1);
-                    var img2 = Image.FromFile(pages[i].Pic2);
-                    var img3 = Image.FromFile(pages[i].Pic3);
-
-
-                    //int qualityDivisor = 7; // the lower, the better
-                    var canvasWidth = (img0.Width + img1.Width + img2.Width + img3.Width) / _qualityDivisor;
-                    var canvasHeight = (img0.Height + img1.Height + img2.Height + img3.Height) / _qualityDivisor;
-
-                    using (Bitmap bmp = new Bitmap(canvasWidth, canvasHeight))
-                    {
-                        using (Graphics g = Graphics.FromImage(bmp))
-                        {
-                            canvasWidth = canvasWidth / 2;
-                            canvasHeight = canvasHeight / 2;
-                            
-                            g.DrawImage(
-                                img0, 
-                                0, 
-                                0, 
-                                canvasWidth, 
-                                canvasHeight);
-                            
-                            g.DrawImage(
-                                img1, 
-                                canvasWidth, 
-                                0, 
-                                canvasWidth, 
-                                canvasHeight);
-                            
-                            g.DrawImage(
-                                img2, 
-                                0, 
-                                canvasHeight, 
-                                canvasWidth, 
-                                canvasHeight);
-
-
-                            g.DrawImage(
-                                img3, 
-                                canvasWidth, 
-                                canvasHeight, 
-                                canvasWidth, 
-                                canvasHeight);
-                        }
-
-                        var fileName = string.Format("{0}\\page_{1}.png", destinationFolder, i + 1);
-                        bmp.Save(fileName, ImageFormat.Png);
-
-                        _bw.ReportProgress(0, new UserStateModel()
-                        {
-                            Message = string.Format("Saving: {0}", fileName),
-                            PreviewFile = fileName
-                        });
-
-                    }
-
-                    img0.Dispose();
-                    img1.Dispose();
-                    img2.Dispose();
-                    img3.Dispose();
-                }
+                Generator.Generate2x2(ref fileList, ref e, ref _bw, ref pctPreview, ref _destinationFolder, ref txtDestination, ref _qualitySettings, ref cellSpacing);
 
             } catch (Exception ex)
             {
@@ -323,6 +138,7 @@ namespace SimpleCollageGenerator
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            lblQuality.Text = string.Format("Quality ({0}%)", trkQuality.Value);
             _bw.DoWork += _bw_DoWork;
             _bw.ProgressChanged += _bw_ProgressChanged;
             _bw.RunWorkerCompleted += _bw_RunWorkerCompleted;
@@ -360,6 +176,34 @@ namespace SimpleCollageGenerator
             {
                 txtDestination.Text = folder;
             }
+        }
+
+        private void btnExploreSrc_Click(object sender, EventArgs e)
+        {
+            if (Directory.Exists(txtSource.Text))
+            {
+                Process.Start("explorer.exe", txtSource.Text);
+            } else
+            {
+                MessageBox.Show("Source Folder Not Found", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnExploreDest_Click(object sender, EventArgs e)
+        {
+            if (Directory.Exists(txtDestination.Text))
+            {
+                Process.Start("explorer.exe", txtDestination.Text);
+            }
+            else
+            {
+                MessageBox.Show("Source Folder Not Found", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void trkQuality_Scroll(object sender, EventArgs e)
+        {
+            lblQuality.Text = string.Format("Quality ({0}%)", trkQuality.Value);
         }
     }
 }
