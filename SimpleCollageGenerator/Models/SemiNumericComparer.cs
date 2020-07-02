@@ -22,6 +22,5 @@ namespace SimpleCollageGenerator.Models
             .OrderBy(x => x.SortStr)
             .Select(x => x.OrgStr);
         }
-
     }
 }

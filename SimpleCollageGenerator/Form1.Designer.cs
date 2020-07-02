@@ -42,6 +42,8 @@
             this.label4 = new System.Windows.Forms.Label();
             this.btnExploreSrc = new System.Windows.Forms.Button();
             this.btnExploreDest = new System.Windows.Forms.Button();
+            this.cboLayout = new System.Windows.Forms.ComboBox();
+            this.label3 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.trkQuality)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pctPreview)).BeginInit();
             this.SuspendLayout();
@@ -80,7 +82,7 @@
             this.lstLogs.FormattingEnabled = true;
             this.lstLogs.Location = new System.Drawing.Point(12, 190);
             this.lstLogs.Name = "lstLogs";
-            this.lstLogs.Size = new System.Drawing.Size(810, 355);
+            this.lstLogs.Size = new System.Drawing.Size(810, 407);
             this.lstLogs.TabIndex = 9;
             // 
             // trkQuality
@@ -89,7 +91,7 @@
             this.trkQuality.Maximum = 100;
             this.trkQuality.Minimum = 1;
             this.trkQuality.Name = "trkQuality";
-            this.trkQuality.Size = new System.Drawing.Size(561, 45);
+            this.trkQuality.Size = new System.Drawing.Size(477, 45);
             this.trkQuality.TabIndex = 7;
             this.trkQuality.Value = 30;
             this.trkQuality.Scroll += new System.EventHandler(this.trkQuality_Scroll);
@@ -179,11 +181,32 @@
             this.btnExploreDest.UseVisualStyleBackColor = true;
             this.btnExploreDest.Click += new System.EventHandler(this.btnExploreDest_Click);
             // 
+            // cboLayout
+            // 
+            this.cboLayout.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboLayout.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cboLayout.FormattingEnabled = true;
+            this.cboLayout.Location = new System.Drawing.Point(498, 126);
+            this.cboLayout.Name = "cboLayout";
+            this.cboLayout.Size = new System.Drawing.Size(75, 21);
+            this.cboLayout.TabIndex = 12;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(498, 110);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(39, 13);
+            this.label3.TabIndex = 13;
+            this.label3.Text = "Layout";
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(834, 561);
+            this.ClientSize = new System.Drawing.Size(834, 622);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.cboLayout);
             this.Controls.Add(this.btnExploreDest);
             this.Controls.Add(this.btnExploreSrc);
             this.Controls.Add(this.label4);
@@ -226,6 +249,8 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button btnExploreSrc;
         private System.Windows.Forms.Button btnExploreDest;
+        private System.Windows.Forms.ComboBox cboLayout;
+        private System.Windows.Forms.Label label3;
     }
 }
 

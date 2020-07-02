@@ -18,6 +18,7 @@ namespace SimpleCollageGenerator
         BackgroundWorker _bw = new BackgroundWorker();
         double _qualitySettings = 1;
         string _destinationFolder = string.Empty;
+        string _layout = string.Empty;
 
         public frmMain()
         {
@@ -29,6 +30,7 @@ namespace SimpleCollageGenerator
             
             if ((btnStart.Text == "Start")|| (btnStart.Text == "&Start"))
             {
+                _layout = cboLayout.Text;
                 _qualitySettings = Double.Parse(trkQuality.Value.ToString()) / 100;
                 lstLogs.Items.Clear();
                 triggerButtons(false);
@@ -54,6 +56,7 @@ namespace SimpleCollageGenerator
                 btnBrowseDest.Enabled = true;
                 btnBrowseSrc.Enabled = true;
                 trkQuality.Enabled = true;
+                cboLayout.Enabled = true;
                 btnStart.Text = "&Start";
             } else
             {
@@ -62,6 +65,7 @@ namespace SimpleCollageGenerator
                 btnBrowseDest.Enabled = false;
                 btnBrowseSrc.Enabled = false;
                 trkQuality.Enabled = false;
+                cboLayout.Enabled = false;
                 btnStart.Text = "&Cancel";
             }
         }
@@ -128,7 +132,7 @@ namespace SimpleCollageGenerator
 
                 var cellSpacing = 3;
 
-                Generator.Generate2x2(ref fileList, ref e, ref _bw, ref pctPreview, ref _destinationFolder, ref txtDestination, ref _qualitySettings, ref cellSpacing);
+                Generator.Generate(ref fileList, ref e, ref _bw, ref pctPreview, ref _destinationFolder, ref txtDestination, _qualitySettings, cellSpacing, _layout);
 
             } catch (Exception ex)
             {
@@ -138,6 +142,13 @@ namespace SimpleCollageGenerator
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            cboLayout.Items.Clear();
+            cboLayout.Items.Add("1x1");
+            cboLayout.Items.Add("1x2");
+            cboLayout.Items.Add("2x2");
+
+            cboLayout.SelectedIndex = 2;
+
             lblQuality.Text = string.Format("Quality ({0}%)", trkQuality.Value);
             _bw.DoWork += _bw_DoWork;
             _bw.ProgressChanged += _bw_ProgressChanged;
